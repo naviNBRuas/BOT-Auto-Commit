@@ -1,0 +1,30 @@
+name: Auto Commit Bot
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs once a day at midnight UTC
+  workflow_dispatch:
+
+jobs:
+  auto-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "your-username"
+          git config --global user.email "your-email@example.com"
+
+      - name: Decide if commit happens
+        run: |
+          RANDOM=$((RANDOM % 2))  # Random number between 0 and 1
+          if [ $RANDOM -eq 0 ]; then
+            echo "Auto commit on $(date)" >> log.txt
+            git add log.txt
+            git commit -m "chore: daily auto commit" || echo "No changes to commit"
+            git push
+          else
+            echo "Skipping commit today."
+          fi
